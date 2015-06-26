@@ -1,0 +1,268 @@
+package pkg;
+
+/**
+ * Created by Admin on 25.06.2015.
+ */
+// Import File object to work with xml file
+import java.io.File;
+
+// Import Document object interface to store parsed file
+import groovy.util.MapEntry;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+// Import xml parser
+import javax.xml.parsers.*;
+
+// Import list data-structure
+import java.util.*;
+
+// Import Map data-structure
+
+
+class OrderBook {
+    // Configure xml file name or path
+    private static String xmlFileName = "C:\\Users\\Admin\\Documents\\orders2.xml";
+
+    private static Document doc;
+
+    public static void main (String[] args) {
+        // Be nice and say hello
+        log("Hello!");
+
+        // Parse xml file
+        loadXML(xmlFileName);
+
+        // Get list of nodes that contain every add order element
+        NodeList nodeList = doc.getElementsByTagName("AddOrder");
+
+        // Create new Map structure to store lists
+        Map<String,List> listMap = new HashMap();
+
+        // Check empty map length
+        log("Map length before population: " + listMap.size());
+
+        // Check empty list length
+        //log("List length before population: " + transactionList.size());
+
+        // Create new list instance
+        List transactionList = new LinkedList();
+        // Iterate over list of nodes that we get from file and create transactions list
+
+        //service variable for testing
+        int iCount = 0;
+
+        for (int je = 0; je < nodeList.getLength(); je++) {
+            // Create new list instance
+            //List transactionList = new LinkedList();
+
+            log("-----"+nodeList.getLength());
+            // Get current item from the list of nodes
+            Node fstNode = nodeList.item(je);
+            Element elj = null;
+
+            // Check if node is not null
+            if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
+                // Cast node object to element
+                elj = (Element) fstNode;
+
+                // Create variable for check book
+                String bookName = elj.getAttribute("book");
+                // Get transactionList with current book
+                transactionList = listMap.get(bookName);
+                // Check if listMap with current book exists
+                if(listMap.get(bookName)==null){
+                    // Create new list instance with current book if not exists
+                    transactionList = new LinkedList();
+                }
+
+
+                //listMap.get(bookName);
+                for(Map.Entry entry : listMap.entrySet()) {
+                    System.out.println("             Map.Entry entry "+entry.getKey() + " - " + entry.getValue() );
+                    LinkedList localLinkList = (LinkedList) entry.getValue();
+                    for(int i=0; i<localLinkList.size();i++) {
+                        Transaction tr = (Transaction) localLinkList.get(i);
+                        System.out.println("             Order id: " + tr.orderID + ", Volume: " + tr.volume + ", Price: " + tr.price + ", Operation Type: " + tr.operationType);
+                    }
+                }
+
+
+
+                // Increase service variable on row in xml file
+                iCount++;
+                // Create new instance of transaction class
+                Transaction newTransaction = new Transaction(Integer.parseInt(elj.getAttribute("orderId")));
+                // Add properties to the Transaction
+                // Set quantity of books
+                newTransaction.setVolume(Integer.parseInt(elj.getAttribute("volume")));
+                // Set price
+                newTransaction.setPrice(Double.parseDouble(elj.getAttribute("price")));
+                // Set operation type
+                newTransaction.setOperationType(elj.getAttribute("operation"));
+
+                /*// Add new transaction to the list of transactions
+                listTrans.add(newTransaction);*/
+
+
+
+
+
+
+
+
+                // Show transaction info in the console
+                log("Transaction orderID: " + newTransaction.orderID + "\n");
+
+                log("Transaction operation: " + newTransaction.getOperationType() + "\n");
+
+                log("Transaction volume: " + newTransaction.getVolume() + "\n");
+
+                log("Transaction price: " + newTransaction.getPrice() + "$\n");
+
+                log("Book: " + elj.getAttribute("book") + "\n");
+
+                System.out.print("\n\n");
+
+                // Add transation to the list of orders
+                transactionList.add(newTransaction);
+            }
+
+            // Check populated list length
+            log("List length after population: " + transactionList.size());
+
+            // Add new list to the map structure with key
+            listMap.put(elj.getAttribute("book"), transactionList);
+
+            // Check empty map length
+            log("Map length after population: " + listMap.size());
+
+            // Check that map returns list by its key
+            List returnList = (List) listMap.get(elj.getAttribute("book"));
+
+            log("Size of the List returned by map for 'book' key: " + returnList.size());
+            log("++++Map+++++++"+listMap.entrySet()/*.get(elj.getAttribute("book"))*/);
+            System.out.println("size " + returnList.size());
+            for(int i=0;i<returnList.size();i++){
+                Transaction tr2 = (Transaction)returnList.get(0);
+                log("++++ReturnList+++++++" + tr2.getOperationType()+'\n');
+            }
+            //log("++++ReturnList+++++++"+returnList.get(0));
+
+
+
+            //showMap(listMap);
+
+
+        }
+
+        System.out.println("quantity of string in xml fail: " + iCount);
+    }
+
+
+/*    private static void showMap(Map mmap){
+
+
+        }
+    }*/
+
+    // Function that logs string to the console
+    private static void log(String string) {
+        System.out.println(string);
+    }
+
+    // Function that takes a filepath string and returns parsed xml file
+    private static void loadXML(String filepath) {
+        File xmlFile;
+        // Load file object into memory
+        try {
+            xmlFile = new File(filepath);
+
+            // Check that file exists and is not a directory
+            if (xmlFile.exists() && xmlFile.isFile()) {
+                // Log loaded file info
+                log("\n-- XML file was loaded succesfully --");
+                log("File name: " + xmlFile.getName());
+                log("Can read: " + xmlFile.canRead());
+                log("Can write: " + xmlFile.canWrite());
+                log("Can execute: " + xmlFile.canExecute());
+                log("-- \n");
+
+                // Parse file after it is loaded
+                doc = parseXML(xmlFile);
+
+            } else {
+                throw new Error("XML file does not exist at the given path");
+            }
+
+        } catch (NullPointerException e) {
+            // If xmlFileName is null - show error
+            log("Error: XML file name should not be null.");
+        }
+    }
+
+    // This function takes in plain File object and parses it into xml Document object
+    private static Document parseXML(File xmlFile) {
+
+        // Create new instance of DocumentBuilderFactory to create parser for xml
+        DocumentBuilderFactory parserBuilder = DocumentBuilderFactory.newInstance();
+
+        // Create an instance of Document builder to parse input file
+        try {
+            DocumentBuilder parser = parserBuilder.newDocumentBuilder();
+
+            // Parse File into Document
+            try {
+                Document parsedXml = parser.parse(xmlFile);
+
+                log("\n-- XML file was parsed successfully --");
+                log("XML Version: " + parsedXml.getXmlVersion());
+                log("XML Encoding: " + parsedXml.getXmlEncoding());
+                log("--\n");
+
+                return parsedXml;
+            } catch (Exception e) {
+                log("Error: Failed to parse XML file.");
+                return null;
+            }
+
+        } catch (ParserConfigurationException e) {
+            log("Error: Failed to setup XML parser.");
+            return null;
+        }
+    }
+
+
+    static class Transaction {
+        // Store orderID
+        public Integer orderID;
+        // Store amount of books in that order
+        private Integer volume;
+        // Store book price
+        private Double price;
+        // Store operation type
+        private String operationType;
+
+        // Class constructior
+        public Transaction (Integer orderID) {
+            // Assign recieved orderID to the order
+            this.orderID = orderID;
+        }
+
+        // Create property setters
+        public void setVolume(Integer volume) { this.volume = volume; }
+
+        public void setPrice(Double price) { this.price = price; }
+
+        public void setOperationType(String operation) { this.operationType = operation; }
+
+        // Create property getters
+        public Integer getVolume() { return this.volume; }
+
+        public Double getPrice() { return this.price; }
+
+        public String getOperationType() { return this.operationType; }
+    }
+}
