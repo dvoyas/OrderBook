@@ -79,18 +79,6 @@ class OrderBook {
                 }
 
 
-                //listMap.get(bookName);
-                for(Map.Entry entry : listMap.entrySet()) {
-                    System.out.println("             Map.Entry entry "+entry.getKey() + " - " + entry.getValue() );
-                    LinkedList localLinkList = (LinkedList) entry.getValue();
-                    for(int i=0; i<localLinkList.size();i++) {
-                        Transaction tr = (Transaction) localLinkList.get(i);
-                        System.out.println("             Order id: " + tr.orderID + ", Volume: " + tr.volume + ", Price: " + tr.price + ", Operation Type: " + tr.operationType);
-                    }
-                }
-
-
-
                 // Increase service variable on row in xml file
                 iCount++;
                 // Create new instance of transaction class
@@ -103,32 +91,41 @@ class OrderBook {
                 // Set operation type
                 newTransaction.setOperationType(elj.getAttribute("operation"));
 
-                /*// Add new transaction to the list of transactions
-                listTrans.add(newTransaction);*/
-
-
-
-
-
-
-
-
                 // Show transaction info in the console
                 log("Transaction orderID: " + newTransaction.orderID + "\n");
-
                 log("Transaction operation: " + newTransaction.getOperationType() + "\n");
-
                 log("Transaction volume: " + newTransaction.getVolume() + "\n");
-
                 log("Transaction price: " + newTransaction.getPrice() + "$\n");
-
                 log("Book: " + elj.getAttribute("book") + "\n");
-
                 System.out.print("\n\n");
 
-                // Add transation to the list of orders
+
+                Integer iVolume = findAndReleaseTransaction(listMap, elj.getAttribute("book"), newTransaction.getOperationType(),
+                        newTransaction.getVolume(),newTransaction.getPrice());
+                if (iVolume!=null){
+                    newTransaction.setVolume(iVolume);
+                    log("record sell was deleted");
+
+                }
+
+
+
+                //listMap.get(bookName);
+                for(Map.Entry entry : listMap.entrySet()) {
+                    System.out.println("             Map.Entry entry "+entry.getKey() + " - " + entry.getValue() );
+                    LinkedList localLinkList = (LinkedList) entry.getValue();
+                    for(int i=0; i<localLinkList.size();i++) {
+                        Transaction tr = (Transaction) localLinkList.get(i);
+                        System.out.println("             Order id: " + tr.orderID + ", Volume: " + tr.volume + ", Price: " + tr.price + ", Operation Type: " + tr.operationType);
+                    }
+                }
+
+
+                // Add bew transation to the list of orders
                 transactionList.add(newTransaction);
             }
+
+
 
             // Check populated list length
             log("List length after population: " + transactionList.size());
@@ -162,11 +159,34 @@ class OrderBook {
     }
 
 
-/*    private static void showMap(Map mmap){
+    // Function that find operations for realise. Negative operation Type
+    private static Integer findAndReleaseTransaction(Map listMap, String bookName, String operationType,
+                                                     Integer volume,Double price){
+        // Change operation type for find opposite transaction
+        if (operationType == "SELL")
+            operationType = "BUY";
+        else if (operationType == "BUY")
+            operationType = "SELL";
+        Integer result = null;
+        if (bookName != null) {
+            List returnList = (List) listMap.get(bookName);
+            if (returnList != null) {
+                for (int i = 0; i < returnList.size(); i++) {
+                    Transaction tr = (Transaction) returnList.get(i);
+                    //if new operation buy
+                    if ((operationType == tr.operationType) && (operationType == "SELL") &&
+                            (price >= tr.price)) {
+                        if (volume >= tr.volume) {
+                            result = (volume - tr.volume);
 
-
+                            returnList.remove(i);
+                        }
+                    }
+                }
+            }
         }
-    }*/
+        return result;
+    }
 
     // Function that logs string to the console
     private static void log(String string) {
