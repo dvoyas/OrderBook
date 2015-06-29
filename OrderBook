@@ -22,9 +22,9 @@ import java.util.*;
 // Import Map data-structure
 
 
-class OrderBook {
+class OrderBookWDelete {
     // Configure xml file name or path
-    private static String xmlFileName = "C:\\Users\\Admin\\Documents\\orders2.xml";
+    private static String xmlFileName = "C:\\Users\\Admin\\Documents\\orders01.xml";
 
     private static Document doc;
 
@@ -108,7 +108,10 @@ class OrderBook {
 
                 }
 
-
+                // If volume > 0 add new transaction to the list of orders
+                if (((iVolume != null) && (iVolume > 0)) || (iVolume == null)) {
+                    transactionList.add(newTransaction);
+                }
 
                 //listMap.get(bookName);
                 for(Map.Entry entry : listMap.entrySet()) {
@@ -120,9 +123,6 @@ class OrderBook {
                     }
                 }
 
-
-                // Add bew transation to the list of orders
-                transactionList.add(newTransaction);
             }
 
 
@@ -163,10 +163,10 @@ class OrderBook {
     private static Integer findAndReleaseTransaction(Map listMap, String bookName, String operationType,
                                                      Integer volume,Double price){
         // Change operation type for find opposite transaction
-        if (operationType == "SELL")
+        /*if (operationType == "SELL")
             operationType = "BUY";
         else if (operationType == "BUY")
-            operationType = "SELL";
+            operationType = "SELL";*/
         Integer result = null;
         if (bookName != null) {
             List returnList = (List) listMap.get(bookName);
@@ -174,12 +174,31 @@ class OrderBook {
                 for (int i = 0; i < returnList.size(); i++) {
                     Transaction tr = (Transaction) returnList.get(i);
                     //if new operation buy
-                    if ((operationType == tr.operationType) && (operationType == "SELL") &&
-                            (price >= tr.price)) {
+                    if (tr.operationType.equals("BUY") && operationType.equals("SELL") &&
+                            (tr.price >= price)) {
+                        System.out.println("                              Check completed!");
+
                         if (volume >= tr.volume) {
                             result = (volume - tr.volume);
-
                             returnList.remove(i);
+                        }
+                        else if (volume < tr.volume){
+                            tr.setVolume(tr.volume-volume);
+                            result = 0;
+                        }
+                    }
+                    //if new operation buy
+                    if (tr.operationType.equals("SELL") && operationType.equals("BUY") &&
+                            (tr.price <= price)) {
+                        System.out.println("                              Check completed!");
+
+                        if (volume >= tr.volume) {
+                            result = (volume - tr.volume);
+                            returnList.remove(i);
+                        }
+                        else if (volume < tr.volume){
+                            tr.setVolume(tr.volume-volume);
+                            result = 0;
                         }
                     }
                 }
