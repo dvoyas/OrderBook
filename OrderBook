@@ -7,7 +7,6 @@ package pkg;
 import java.io.File;
 
 // Import Document object interface to store parsed file
-import groovy.util.MapEntry;
 import org.w3c.dom.*;
 
 // Import xml parser
@@ -21,7 +20,7 @@ import java.util.*;
 
 class OrderBookWDelete {
     // Configure xml file name or path
-    private static String xmlFileName = "C:\\Users\\Admin\\Documents\\orders2.xml";
+    private static String xmlFileName = "C:\\Users\\Admin\\Documents\\orders.xml";
 
     static Document doc = null;
 
@@ -240,16 +239,16 @@ class OrderBookWDelete {
                             log("List length after population: " + transactionList.size());
 
                             // Add new list to the map structure with key
-                            listMap.put(bookName, transactionList);
+                            listMap.put(bkName, transactionList);//////////////////////
 
                             // Check empty map length
                             log("Map length after population: " + listMap.size());
 
                             // Check that map returns list by its key
-                            List returnList = (List) listMap.get(bookName);
+                            List returnList = (List) listMap.get(bkName); //////////////////////
 
                             log("Size of the List returned by map for 'book' key: " + returnList.size());
-                            log("++++Map+++++++" + listMap.entrySet()/*.get(elj.getAttribute("book"))*/);
+                            log("++++Map+++++++" + listMap.entrySet());
                             System.out.println("size " + returnList.size());
                             for (int j = 0; j < returnList.size(); j++) {
                                 Transaction tr2 = (Transaction) returnList.get(0);
@@ -364,9 +363,6 @@ class OrderBookWDelete {
                 ///
                 System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
                 ///
-
-
-
 
             } else {
                 throw new Error("XML file does not exist at the given path");
