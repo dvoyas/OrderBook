@@ -18,11 +18,14 @@ import java.util.*;
 // Import Map data-structure
 
 
-class OrderBookWDelete {
+class OrderBookRelise1 {
     // Configure xml file name or path
     private static String xmlFileName = "C:\\Users\\Admin\\Documents\\orders.xml";
 
     static Document doc = null;
+
+    // Create new Map structure to store lists
+    private static Map<String, List> listMap = new HashMap();
 
     public static void main(String[] args) {
 
@@ -35,31 +38,12 @@ class OrderBookWDelete {
             // Parse xml file
             loadXML(xmlFileName);
 
-/*        // Get list of nodes that contain every add order element
-        //NodeList nodeList = doc.getElementsByTagName("AddOrder");
-        //if (doc.hasChildNodes()) {
-            NodeList nodeList = doc.getChildNodes();
-        //}*/
-
-
-            // Create new Map structure to store lists
-            ///Map<String,List> listMap = new HashMap();
-
-
-            // Check empty map length
-            ///log("Map length before population: " + listMap.size());
-
-            // Check empty list length
-            //log("List length before population: " + transactionList.size());
-
-
-            // Get list of nodes that contain every add order element
-            //NodeList nodeList = doc.getElementsByTagName("AddOrder");
             NodeList nodeList = doc.getElementsByTagName("Orders");
             log("___________________nodeList" + nodeList.getLength());
             if (doc.hasChildNodes()) {
                 doNode(doc.getChildNodes());
             }
+            printListMap(listMap);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -67,43 +51,27 @@ class OrderBookWDelete {
     }
 
     private static void doNode(NodeList nodeList) {
-        // Create new Map structure to store lists
-        Map<String, List> listMap = new HashMap();
         // Create new list instance
         List transactionList = new LinkedList();
-        // Iterate over list of nodes that we get from file and create transactions list
-
-
-        //nodeList = doc.getChildNodes();
 
         log("___________________nodeList: " + nodeList.getLength());
+        // Iterate over list of nodes that we get from file and create transactions list
         for (int count = 0; count < nodeList.getLength(); count++) {
-            // Create new list instance
-            //List transactionList = new LinkedList();
-
-            log("-----" + nodeList.getLength());
             // Get current item from the list of nodes
             Node fstNode = nodeList.item(count);
-            ///Element elj = null;
 
             // Check if node is not null
             if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
-                // Cast node object to element
-                //elj = (Element) fstNode;
 
+                // create String variable bookName for store current book name
                 String bookName = "";
-
                 if (fstNode.hasAttributes() && (fstNode.getNodeName() == "AddOrder")) {
-
-
                     // Create variable for check book
                     NamedNodeMap nodeMap = fstNode.getAttributes();
                     Transaction newTransaction = null;
                     for (int i = 0; i < nodeMap.getLength(); i++) {
 
                         Node node = nodeMap.item(i);
-                        System.out.println("attr name : " + node.getNodeName());
-                        System.out.println("attr value : " + node.getNodeValue());
 
                         //check if attribute name equal book
                         if (node.getNodeName() == "book") {
@@ -121,7 +89,6 @@ class OrderBookWDelete {
                         }
                         //check if attr name equal orderId create new instance of transaction class
                         if (node.getNodeName() == "orderId") {
-
                             // Create new instance of transaction class
                             newTransaction.setOrderID(Integer.parseInt(node.getNodeValue()));
                         }
@@ -142,56 +109,45 @@ class OrderBookWDelete {
                         if (i == (nodeMap.getLength() - 1)) {
 
                             // Show transaction info in the console
-                            log("Transaction orderID: " + newTransaction.getOrderID() + "\n");
+                            /*log("Transaction orderID: " + newTransaction.getOrderID() + "\n");
                             log("Transaction operation: " + newTransaction.operationType + "\n");
                             log("Transaction volume: " + newTransaction.getVolume() + "\n");
                             log("Transaction price: " + newTransaction.getPrice() + "$\n");
                             log("Book: " + listMap.get(bookName) + "\n");
                             System.out.print("\n\n");
 
-
+*/
                             Integer iVolume = findAndReleaseTransaction(listMap, bookName, newTransaction.operationType,
                                     newTransaction.getVolume(), newTransaction.getPrice());
                             if (iVolume != null) {
                                 newTransaction.setVolume(iVolume);
-                                log("record sell was deleted");
-
                             }
                             // If volume > 0 add new transaction to the list of orders
                             if (((iVolume != null) && (iVolume > 0)) || (iVolume == null)) {
                                 transactionList.add(newTransaction);
                             }
                             //listMap.get(bookName);
-                            for (Map.Entry entry : listMap.entrySet()) {
-                                System.out.println("             Map.Entry entry " + entry.getKey() + " - " + entry.getValue());
-                                LinkedList localLinkList = (LinkedList) entry.getValue();
-                                for (int j = 0; j < localLinkList.size(); j++) {
-                                    Transaction tr = (Transaction) localLinkList.get(j);
-                                    System.out.println("             Order id: " + tr.getOrderID() + ", Volume: " + tr.getVolume() + ", Price: " + tr.getPrice() + ", Operation Type: " + tr.operationType);
-                                }
-                            }
+                            //printListMap(listMap);
+
+
 
                             // Check populated list length
-                            log("List length after population: " + transactionList.size());
+                            ///log("List length after population: " + transactionList.size());
 
                             // Add new list to the map structure with key
                             listMap.put(bookName, transactionList);
 
                             // Check empty map length
-                            log("Map length after population: " + listMap.size());
+                            ///log("Map length after population: " + listMap.size());
 
                             // Check that map returns list by its key
                             List returnList = (List) listMap.get(bookName);
-
-                            log("Size of the List returned by map for 'book' key: " + returnList.size());
-                            log("++++Map+++++++" + listMap.entrySet()/*.get(elj.getAttribute("book"))*/);
-                            System.out.println("size " + returnList.size());
+/*                            log("Size of the List returned by map for 'book' key: " + returnList.size());
+                            log("++++Map+++++++" + listMap.entrySet());
+                            System.out.println("size " + returnList.size());*/
                             for (int j = 0; j < returnList.size(); j++) {
                                 Transaction tr2 = (Transaction) returnList.get(0);
-                                log("++++ReturnList+++++++" + tr2.operationType + '\n');
                             }
-                            //log("++++ReturnList+++++++"+returnList.get(0));
-                            //showMap(listMap);
                         }
                     }
                 }
@@ -226,41 +182,30 @@ class OrderBookWDelete {
                             if (iOrderId != null){
                                 findAndDeleteTransaction(listMap, bkName, iOrderId);
                             }
-                            for (Map.Entry entry : listMap.entrySet()) {
-                                System.out.println("             Map.Entry entry " + entry.getKey() + " - " + entry.getValue());
-                                LinkedList localLinkList = (LinkedList) entry.getValue();
-                                for (int j = 0; j < localLinkList.size(); j++) {
-                                    Transaction tr = (Transaction) localLinkList.get(j);
-                                    System.out.println("             Order id: " + tr.getOrderID() + ", Volume: " + tr.getVolume() + ", Price: " + tr.getPrice() + ", Operation Type: " + tr.operationType);
-                                }
-                            }
 
+                            //printListMap(listMap);
+/*
                             // Check populated list length
-                            log("List length after population: " + transactionList.size());
+                            log("List length after population: " + transactionList.size());*/
 
                             // Add new list to the map structure with key
-                            listMap.put(bkName, transactionList);//////////////////////
-
+                            listMap.put(bkName, transactionList);
+/*
                             // Check empty map length
-                            log("Map length after population: " + listMap.size());
+                            log("Map length after population: " + listMap.size());*/
 
                             // Check that map returns list by its key
-                            List returnList = (List) listMap.get(bkName); //////////////////////
+                            List returnList = (List) listMap.get(bkName);
 
-                            log("Size of the List returned by map for 'book' key: " + returnList.size());
+                           /* log("Size of the List returned by map for 'book' key: " + returnList.size());
                             log("++++Map+++++++" + listMap.entrySet());
-                            System.out.println("size " + returnList.size());
+                            System.out.println("size " + returnList.size());*/
                             for (int j = 0; j < returnList.size(); j++) {
                                 Transaction tr2 = (Transaction) returnList.get(0);
-                                log("++++ReturnList+++++++" + tr2.operationType + '\n');
                             }
-                            //log("++++ReturnList+++++++"+returnList.get(0));
-                            //showMap(listMap);
                         }
                     }
                 }
-
-
             }
             if (fstNode.hasChildNodes()) {
 
@@ -284,26 +229,36 @@ class OrderBookWDelete {
                     //if new operation buy
                     if (tr.operationType.equals("BUY") && operationType.equals("SELL") &&
                             (tr.price >= price)) {
-                        System.out.println("                              Check completed!");
-
+                        // check if volume in new transaction better than found transaction
                         if (volume >= tr.getVolume()) {
-                            result = (volume - tr.getVolume());
+                            // remove found transaction
                             returnList.remove(i);
-                        } else if (volume < tr.getVolume()) {
+                            // return result as volume in new transaction minus volume in found transaction
+                            result = (volume - tr.getVolume());
+                        }
+                        // check if volume in new transaction less than found transaction
+                        else if (volume < tr.getVolume()) {
+                            // set volume in found transaction
                             tr.setVolume(tr.getVolume() - volume);
+                            // return 0. that means new transaction not added
                             result = 0;
                         }
                     }
                     //if new operation buy
                     if (tr.operationType.equals("SELL") && operationType.equals("BUY") &&
                             (tr.price <= price)) {
-                        System.out.println("                              Check completed!");
-
+                        // check if volume in new transaction better than found transaction
                         if (volume >= tr.getVolume()) {
-                            result = (volume - tr.getVolume());
+                            // remove found transaction
                             returnList.remove(i);
-                        } else if (volume < tr.getVolume()) {
+                            // return result as volume in new transaction minus volume in found transaction
+                            result = (volume - tr.getVolume());
+                        }
+                        // check if volume in new transaction less than found transaction
+                        else if (volume < tr.getVolume()) {
+                            // set volume in found transaction
                             tr.setVolume(tr.getVolume() - volume);
+                            // return 0. that means new transaction not added
                             result = 0;
                         }
                     }
@@ -323,16 +278,12 @@ class OrderBookWDelete {
                     Transaction tr = (Transaction) returnList.get(i);
                     //if new operation buy
                     if (tr.getOrderID() == orderId) {
-                        System.out.println("                              Transaction " + orderId + " was deleted");
                         returnList.remove(i);
                     }
                 }
             }
         }
     }
-
-
-
 
     // Function that logs string to the console
     private static void log(String string) {
@@ -358,7 +309,6 @@ class OrderBookWDelete {
 
                 // Parse file after it is loaded
                 doc = parseXML(xmlFile);
-
 
                 ///
                 System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
@@ -405,6 +355,16 @@ class OrderBookWDelete {
         }
     }
 
+    private static void printListMap(Map<String, List> listMap) {
+        for (Map.Entry entry : listMap.entrySet()) {
+            System.out.println("             Map.Entry entry " + entry.getKey() + " - " + entry.getValue());
+            LinkedList localLinkList = (LinkedList) entry.getValue();
+            for (int j = 0; j < localLinkList.size(); j++) {
+                Transaction tr = (Transaction) localLinkList.get(j);
+                System.out.println("             Order id: " + tr.getOrderID() + ", Volume: " + tr.getVolume() + ", Price: " + tr.getPrice() + ", Operation Type: " + tr.operationType);
+            }
+        }
+    }
 
     static class Transaction {
         // Store orderID
