@@ -39,7 +39,7 @@ public class OrderBookSAXv2 extends DefaultHandler {
     ///private static Map<String, List> listMap = new HashMap();
 
 
-    ///public class MySaxParser extends DefaultHandler {
+    static String xmlFileName = "C:\\Users\\Admin\\Documents\\orders.xml";
     Map<String, List> listMap;
     List<Transaction> transactL;
     String transactionXMLFileName;
@@ -54,7 +54,7 @@ public class OrderBookSAXv2 extends DefaultHandler {
         bookNameTmp = "";
         ///transactL = new ArrayList<Transaction>();
         parseDocument();
-        printDatas();
+        printDatasNew();
 
     }
 
@@ -78,16 +78,92 @@ public class OrderBookSAXv2 extends DefaultHandler {
         /*for(int i = 0; i < listMap.size();i++) {
             transactL = listMap.get(i);
             for (Transaction tmpTrn : transactL) {
-                System.out.println(tmpTrn.getVolume() + "   " + tmpTrn.getOrderID() + "   " + tmpTrn.getPrice() + "   " + tmpTrn.operationType);
+                System.out.println(tmpTrn.getVolume() + "   " + tmpTrn.getOrderID() + "   " + tmpTrn.getPrice() +
+                "   " + tmpTrn.operationType);
             }
         }*/
         //printListMap(listMap);
+        LinkedList linkListTmp;
+        Transaction tr;
         for (Map.Entry entry : listMap.entrySet()) {
             System.out.println("             Map.Entry entry " + entry.getKey() + " - " + entry.getValue());
-            LinkedList localLinkList = (LinkedList) entry.getValue();
-            for (int j = 0; j < localLinkList.size(); j++) {
-                Transaction tr = (Transaction) localLinkList.get(j);
-                System.out.println("       Map.Entry Book Name: " + entry.getKey() + ", Order id: " + tr.getOrderID() + ", Volume: " + tr.getVolume() + ", Price: " + tr.getPrice() + ", Operation Type: " + tr.operationType);
+            linkListTmp = (LinkedList) entry.getValue();
+
+            for (int j = 0; j < linkListTmp.size(); j++) {
+                //linkListTmp.s
+                tr = (Transaction) linkListTmp.get(j);
+                System.out.println("   Map.Entry Book Name: " + entry.getKey() + ", Order id: " + tr.getOrderID() +
+                        ", Volume: " + tr.getVolume() + ", Price: " + tr.getPrice() + ", Operation Type: " +
+                        tr.operationType);
+            }
+        }
+    }
+    private void printDatasNew() {
+        LinkedList linkListTmp;
+        Transaction tr;
+//        ArrayList<Integer> arrListBuy = null;
+//        ArrayList<Integer> arrListSell = null;
+        HashMap<Double, ArrayList<Integer>> mapBuy = new HashMap<>();
+        ArrayList<Integer> arrListBuy;
+        HashMap<Double, ArrayList<Integer>> mapSell = new HashMap<>();
+        ArrayList<Integer> arrListSell;
+        for (Map.Entry entry : listMap.entrySet()) {
+            System.out.println("            Map.Entry entry " + entry.getKey() + " - " + entry.getValue());
+            linkListTmp = (LinkedList) entry.getValue();
+            for (int j = 0; j < linkListTmp.size(); j++) {
+                tr = (Transaction) linkListTmp.get(j);
+                if (tr.operationType.equals("SELL")) {
+                    if(mapSell.get(tr.getPrice()) != null) {
+                        arrListSell = mapSell.get(tr.getPrice());
+                    } else {
+                        arrListSell = new ArrayList<Integer>();
+                    }
+                    arrListSell.add(tr.getVolume());
+                    mapSell.put(tr.getPrice(), arrListSell);
+                }
+                if  (tr.operationType.equals("BUY")) {
+                    if(mapBuy.get(tr.getPrice()) != null) {
+                        arrListBuy = mapBuy.get(tr.getPrice());
+                    } else {
+                        arrListBuy = new ArrayList<Integer>();
+                    }
+                    arrListBuy.add(tr.getVolume());
+                    mapBuy.put(tr.getPrice(), arrListBuy);
+                }
+
+
+
+                System.out.println("   Map.Entry Book Name: " + entry.getKey() + ", Order id: " + tr.getOrderID() +
+                        ", Volume: " + tr.getVolume() + ", Price: " + tr.getPrice() + ", Operation Type: " +
+                        tr.operationType);
+            }
+            //if (mapBuy.size() > mapSell.size())
+            Integer sumValue;
+
+            for (Map.Entry entry1 : mapBuy.entrySet()){
+                arrListBuy = (ArrayList) entry1.getValue();
+                sumValue = 0;
+                for (int k = 0; k < arrListBuy.size(); k++){
+                    sumValue += arrListBuy.get(k);
+                }
+                log("    Bit: " + entry1.getKey() + " value " + sumValue);
+            }
+        }
+    }
+    private void createLists() {
+        //printListMap(listMap);
+        LinkedList linkListTmp;
+        Transaction tr;
+        for (Map.Entry entry : listMap.entrySet()) {
+            System.out.println("             Map.Entry entry " + entry.getKey() + " - " + entry.getValue());
+            linkListTmp = (LinkedList) entry.getValue();
+
+            for (int j = 0; j < linkListTmp.size(); j++) {
+                //linkListTmp.s
+                tr = (Transaction) linkListTmp.get(j);
+                System.out.println("   Map.Entry Book Name: " + entry.getKey() + ", Order id: " + tr.getOrderID() +
+                        ", Volume: " + tr.getVolume() + ", Price: " + tr.getPrice() + ", Operation Type: " +
+                        tr.operationType);
             }
         }
     }
@@ -180,221 +256,22 @@ public class OrderBookSAXv2 extends DefaultHandler {
 
 
     public static void main(String[] args) {
-
-
-        /*try {
+        try {
             // Be nice and say hello
             log("Hello!");
 
+            new OrderBookSAXv2(xmlFileName);
 
-            // Parse xml file
-            loadXML(xmlFileName);
-
-
-            NodeList nodeList = doc.getElementsByTagName("Orders");
-            log("___________________nodeList" + nodeList.getLength());
-            if (doc.hasChildNodes()) {
-                doNode(doc.getChildNodes());
-            }
-            printListMap(listMap);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-        }*/
-        new OrderBookSAXv2("C:\\Users\\Admin\\Documents\\orders01.xml");
-
-    }
-
-
-
-    /*
-
-
-
-
-
-
-
-        private static void doNode(NodeList nodeList) {
-            // Create new list instance
-            List transactionList = new LinkedList();
-
-            log("___________________nodeList: " + nodeList.getLength());
-            // Iterate over list of nodes that we get from file and create transactions list
-            for (int count = 0; count < nodeList.getLength(); count++) {
-                // Get current item from the list of nodes
-                Node fstNode = nodeList.item(count);
-
-                // Check if node is not null
-                if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
-
-                    // create String variable bookName for store current book name
-                    String bookName = "";
-                    if (fstNode.hasAttributes() && (fstNode.getNodeName() == "AddOrder")) {
-                        // Create variable for check book
-                        NamedNodeMap nodeMap = fstNode.getAttributes();
-                        Transaction newTransaction = null;
-                        for (int i = 0; i < nodeMap.getLength(); i++) {
-
-                            Node node = nodeMap.item(i);
-
-                            //check if attribute name equal book
-                            if (node.getNodeName() == "book") {
-                                bookName = node.getNodeValue();
-
-                                // Get transactionList with current book
-                                transactionList = listMap.get(bookName);
-
-                                // Check if listMap with current book exists
-                                if (listMap.get(bookName) == null) {
-
-                                    // Create new list instance with current book if not exists
-                                    transactionList = new LinkedList();
-                                }
-                            }
-                            //check if attr name equal orderId create new instance of transaction class
-                            if (node.getNodeName() == "orderId") {
-                                // Create new instance of transaction class
-                                newTransaction.setOrderID(Integer.parseInt(node.getNodeValue()));
-                            }
-
-                            // Add properties to the Transaction
-                            // If attr name equal volume set quantity of books
-                            if (node.getNodeName() == "volume") {
-                                newTransaction.setVolume(Integer.parseInt(node.getNodeValue()));
-                            }
-                            // If attr name equal price set price
-                            if (node.getNodeName() == "price") {
-                                newTransaction.setPrice(Double.parseDouble(node.getNodeValue()));
-                            }
-                            // If attr name equal operation set operation type
-                            if (node.getNodeName() == "operation") {
-                                newTransaction = new Transaction(node.getNodeValue());
-                            }
-                            if (i == (nodeMap.getLength() - 1)) {
-
-                                // Show transaction info in the console
-                                */
-/*log("Transaction orderID: " + newTransaction.getOrderID() + "\n");
-                            log("Transaction operation: " + newTransaction.operationType + "\n");
-                            log("Transaction volume: " + newTransaction.getVolume() + "\n");
-                            log("Transaction price: " + newTransaction.getPrice() + "$\n");
-                            log("Book: " + listMap.get(bookName) + "\n");
-                            System.out.print("\n\n");
-
-*//*
-    ///////////////////////////////////////////////////////////////////////////////////////////
-                            Integer iVolume = findAndReleaseTransaction(listMap, bookName, newTransaction.operationType,
-                                    newTransaction.getVolume(), newTransaction.getPrice());
-                            if (iVolume != null) {
-                                newTransaction.setVolume(iVolume);
-                            }
-                            // If volume > 0 add new transaction to the list of orders
-                            if (((iVolume != null) && (iVolume > 0)) || (iVolume == null)) {
-                                transactionList.add(newTransaction);
-                            }
-                            //listMap.get(bookName);
-                            //printListMap(listMap);
-
-
-
-                            // Check populated list length
-                            ///log("List length after population: " + transactionList.size());
-
-                            // Add new list to the map structure with key
-                            listMap.put(bookName, transactionList);
-
-                            // Check empty map length
-                            ///log("Map length after population: " + listMap.size());
-
-                            // Check that map returns list by its key
-                            List returnList = (List) listMap.get(bookName);
-*/
-/*                            log("Size of the List returned by map for 'book' key: " + returnList.size());
-                            log("++++Map+++++++" + listMap.entrySet());
-                            System.out.println("size " + returnList.size());*//*
-
-                            for (int j = 0; j < returnList.size(); j++) {
-                                Transaction tr2 = (Transaction) returnList.get(0);
-                            }
-                        }
-                    }
-                }
-    ///////////////////////////////////////////////////////////////////////////////////////////
-                if (fstNode.hasAttributes() && (fstNode.getNodeName() == "DeleteOrder")) {
-
-
-                    // Create variable for check book
-                    NamedNodeMap nodeMap = fstNode.getAttributes();
-                    Transaction newTransaction = null;
-                    String bkName = "";
-                    Integer iOrderId = null;
-                    for (int i = 0; i < nodeMap.getLength(); i++) {
-
-                        Node node = nodeMap.item(i);
-
-                        //check if attribute name equal book
-                        if (node.getNodeName() == "book") {
-                            bkName = node.getNodeValue();
-                        }
-
-                        if (node.getNodeName() == "orderId") {
-
-                            iOrderId = Integer.parseInt(node.getNodeValue());
-                        }
-
-                        if ((i == (nodeMap.getLength() - 1))&&(bkName != "")) {
-
-                            // Get transactionList with current book
-                            transactionList = listMap.get(bkName);
-
-
-                            if (iOrderId != null){
-                                findAndDeleteTransaction(listMap, bkName, iOrderId);
-                            }
-
-                            //printListMap(listMap);
-*/
-/*
-                            // Check populated list length
-                            log("List length after population: " + transactionList.size());*//*
-
-
-                            // Add new list to the map structure with key
-                            listMap.put(bkName, transactionList);
-*/
-/*
-                            // Check empty map length
-                            log("Map length after population: " + listMap.size());*//*
-
-
-                            // Check that map returns list by its key
-                            List returnList = (List) listMap.get(bkName);
-
-                           */
-/* log("Size of the List returned by map for 'book' key: " + returnList.size());
-                            log("++++Map+++++++" + listMap.entrySet());
-                            System.out.println("size " + returnList.size());*//*
-
-                            for (int j = 0; j < returnList.size(); j++) {
-                                Transaction tr2 = (Transaction) returnList.get(0);
-                            }
-                        }
-                    }
-                }
-            }
-            if (fstNode.hasChildNodes()) {
-
-                // loop again if has child nodes
-                doNode(fstNode.getChildNodes());
-
-            }
         }
 
     }
-*/
+
     // Function that find operations for realise. Negative operation Type
     private static Integer findAndReleaseTransaction(Map listMap, String bookName, String operationType,
-                                                     Integer volume, Double price) {
+                                                     Integer volume, Double price)
+    {
         Integer result = null;
         if (bookName != null) {
             List returnList = (List) listMap.get(bookName);
@@ -459,78 +336,13 @@ public class OrderBookSAXv2 extends DefaultHandler {
             }
         }
     }
-/*
+
     // Function that logs string to the console
     private static void log(String string) {
         System.out.println(string);
     }
 
-    // Function that takes a filepath string and returns parsed xml file
-    private static void loadXML(String filepath) {
-        File xmlFile;
-        // Load file object into memory
-        try {
-            xmlFile = new File(filepath);
-
-            // Check that file exists and is not a directory
-            if (xmlFile.exists() && xmlFile.isFile()) {
-                // Log loaded file info
-                log("\n-- XML file was loaded succesfully --");
-                log("File name: " + xmlFile.getName());
-                log("Can read: " + xmlFile.canRead());
-                log("Can write: " + xmlFile.canWrite());
-                log("Can execute: " + xmlFile.canExecute());
-                log("-- \n");
-
-                // Parse file after it is loaded
-                doc = parseXML(xmlFile);
-
-                ///
-                System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-                ///
-
-            } else {
-                throw new Error("XML file does not exist at the given path");
-            }
-
-        } catch (NullPointerException e) {
-            // If xmlFileName is null - show error
-            log("Error: XML file name should not be null.");
-        }
-    }
-
-    // This function takes in plain File object and parses it into xml Document object
-    private static Document parseXML(File xmlFile) {
-
-        // Create new instance of DocumentBuilderFactory to create parser for xml
-        DocumentBuilderFactory parserBuilder = DocumentBuilderFactory.newInstance();
-
-        // Create an instance of Document builder to parse input file
-        try {
-            DocumentBuilder parser = parserBuilder.newDocumentBuilder();
-
-            // Parse File into Document
-            try {
-                Document parsedXml = parser.parse(xmlFile);
-
-                log("\n-- XML file was parsed successfully --");
-                log("XML Version: " + parsedXml.getXmlVersion());
-                log("XML Encoding: " + parsedXml.getXmlEncoding());
-                log("--\n");
-
-                return parsedXml;
-            } catch (Exception e) {
-                log("Error: Failed to parse XML file.");
-                return null;
-            }
-
-        } catch (ParserConfigurationException e) {
-            log("Error: Failed to setup XML parser.");
-            return null;
-        }
-    }
-*/
-    private static void printListMap(Map<String, List> listMap) {
+/*    private static void printListMap(Map<String, List> listMap) {
         for (Map.Entry entry : listMap.entrySet()) {
             System.out.println("             Map.Entry entry " + entry.getKey() + " - " + entry.getValue());
             LinkedList localLinkList = (LinkedList) entry.getValue();
@@ -539,7 +351,7 @@ public class OrderBookSAXv2 extends DefaultHandler {
                 System.out.println("             Order id: " + tr.getOrderID() + ", Volume: " + tr.getVolume() + ", Price: " + tr.getPrice() + ", Operation Type: " + tr.operationType);
             }
         }
-    }
+    }*/
 
     static class Transaction {
         // Store orderID
