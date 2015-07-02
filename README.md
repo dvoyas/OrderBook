@@ -1,6 +1,6 @@
 Installation:
 
-git clone https://github.com/camomiles/order-book
+git clone https://github.com/dvoyas/OrderBook/blob/master/OrderBook
 
 Usage:
 
