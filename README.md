@@ -6,15 +6,15 @@ Usage:
 
 1. Compile
 
-   javac orderBook.java
+   javac OrderBook.java
 
 2. Run (use -Xmx6g to increase Java Heap size for big files)
 
-   java orderBook
+   java OrderBook
 
    or 
 
-   java -Xmx6g orderBook
+   java -Xmx6g OrderBook
 
 Sample structure for xml input file:
 
