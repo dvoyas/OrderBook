@@ -16,7 +16,7 @@ import java.util.*;
 
 public class OrderBook extends DefaultHandler {
     // store xml file path or name
-    static String xmlFileName = "C:\\Users\\Admin\\Documents\\orders.xml";
+    static String xmlFileName = "orders.xml";
     // store books and their transaction
     Map<String, List> listMap;
     // store transactions in class Transaction
