@@ -67,7 +67,7 @@ public class OrderBook extends DefaultHandler {
                     if (mapSell.get(tr.getPrice()) != null) {
                         arrListSell = mapSell.get(tr.getPrice());
                     } else {
-                        arrListSell = new ArrayList<Integer>();
+                        arrListSell = new ArrayList<>();
                     }
                     arrListSell.add(tr.getVolume());
                     mapSell.put(tr.getPrice(), arrListSell);
@@ -76,7 +76,7 @@ public class OrderBook extends DefaultHandler {
                     if (mapBuy.get(tr.getPrice()) != null) {
                         arrListBuy = mapBuy.get(tr.getPrice());
                     } else {
-                        arrListBuy = new ArrayList<Integer>();
+                        arrListBuy = new ArrayList<>();
                     }
                     arrListBuy.add(tr.getVolume());
                     mapBuy.put(tr.getPrice(), arrListBuy);
@@ -84,16 +84,16 @@ public class OrderBook extends DefaultHandler {
             }
             Integer sumValue;
             // create new ArrayList instance as result for store result before it show
-            List<String[]> result = new ArrayList<String[]>();
-            //HashMap iteration  for transfer datas from mapBuy to result (ArrayList)
+            List<String[]> result = new ArrayList<>();
+            //HashMap iteration  for transfer data from mapBuy to result (ArrayList)
 
             // Sorting mapBuy
-            List<Double> sortedKeys = new ArrayList<Double>(mapBuy.keySet());
+            List<Double> sortedKeys = new ArrayList<>(mapBuy.keySet());
             Object[] sortedBuy = sortedKeys.toArray();
             Arrays.sort(sortedBuy);
 
             // Sorting mapSell
-            sortedKeys = new ArrayList<Double>(mapSell.keySet());
+            sortedKeys = new ArrayList<>(mapSell.keySet());
             Object[] sortedSell = sortedKeys.toArray();
             sortedSell = sortedKeys.toArray();
             Arrays.sort(sortedSell);
@@ -144,8 +144,8 @@ public class OrderBook extends DefaultHandler {
         }
     }
 
-    @Override
     // override standard method for SAX.
+    @Override
     public void startElement(String s, String s1, String elementName, Attributes attributes)
             throws SAXException {
         // if current element is transaction, create new transaction
@@ -168,8 +168,9 @@ public class OrderBook extends DefaultHandler {
             orderIdTmp = Integer.parseInt(attributes.getValue("orderId"));
         }
     }
-    @Override
+
     // override standard method for SAX. Save datas to HashMap
+    @Override
     public void endElement(String s, String s1, String element) throws SAXException {
         if (element.equals("AddOrder")){
             if (listMap.get(bookNameTmp) != null) {
@@ -201,8 +202,9 @@ public class OrderBook extends DefaultHandler {
         }
     }
 
-    @Override
+
     // override standard method for SAX
+    @Override
     public void characters(char[] ac, int i, int j) throws SAXException {
         valueTmp = new String(ac, i, j);
     }
